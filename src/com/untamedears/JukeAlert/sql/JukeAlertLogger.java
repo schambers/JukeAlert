@@ -73,12 +73,12 @@ public class JukeAlertLogger {
 
         plugin.saveConfig();
 
-        db = new Database(host, dbname, user, pass, prefix);
+        db = new Database(host, dbname, user, pass, prefix, this.plugin.getLogger());
         boolean connected = db.connect();
         if (connected) {
             genTables();
         } else {
-            JukeAlert.log(Level.SEVERE, "Could not connect to the database! Fill out your config.yml!");
+            this.plugin.getLogger().log(Level.SEVERE, "Could not connect to the database! Fill out your config.yml!");
         }
     }
 
@@ -126,7 +126,7 @@ public class JukeAlertLogger {
                 info.put(set.getString("snitch_info"), set.getDate("snitch_log_time"));
             }
         } catch (SQLException ex) {
-            JukeAlert.log(Level.SEVERE, "Could not get Snitch Details!", ex);
+            this.plugin.getLogger().log(Level.SEVERE, "Could not get Snitch Details!", ex);
         }
         return info;
     }

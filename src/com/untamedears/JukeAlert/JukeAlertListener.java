@@ -68,15 +68,15 @@ public class JukeAlertListener implements Listener {
 				PlayerReinforcement reinforcement = (PlayerReinforcement) rei;
 				Faction owner = reinforcement.getOwner();
 				if (reinforcement.getSecurityLevel().equals(SecurityLevel.GROUP)) {
-					ja.getJaLogger().logSnitchPlace(player.getWorld().getName(), owner.getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+					ja.jaLogger.logSnitchPlace(player.getWorld().getName(), owner.getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 					player.sendMessage(ChatColor.AQUA + "You've created a snitch block registered to the group " + owner.getName() + ".");
 				} else {
-					ja.getJaLogger().logSnitchPlace(player.getWorld().getName(), "p:" + owner.getFounder(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+					ja.jaLogger.logSnitchPlace(player.getWorld().getName(), "p:" + owner.getFounder(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 					player.sendMessage(ChatColor.AQUA + "You've created a private snitch block; Reinforce it with a group to register others.");
 				}
 			}
 
-			ja.getJaLogger().logSnitchPlace(player.getWorld().getName(), "p:" + player.getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+			ja.jaLogger.logSnitchPlace(player.getWorld().getName(), "p:" + player.getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 			player.sendMessage(ChatColor.AQUA + "You've created a private snitch; reinforce it to add others to it.");
 			return;
 		}
@@ -94,7 +94,7 @@ public class JukeAlertListener implements Listener {
 		}
 		Player player = event.getPlayer();
 		Location loc = player.getLocation();
-		ja.getJaLogger().logSnitchBreak(player.getWorld().getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+		ja.jaLogger.logSnitchBreak(player.getWorld().getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 		//TODO: Make sure this is 100% complete. Also make it remove from the List in JukeAlert.java
 	}
 	
