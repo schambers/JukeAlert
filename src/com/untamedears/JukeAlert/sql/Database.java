@@ -27,6 +27,15 @@ public class Database {
 	private Connection connection;
 	private Logger logger;
 
+	/**
+	 * Constructor
+	 * @param host - host of the database
+	 * @param db - name of the database
+	 * @param user - user to login as in the db
+	 * @param password - password for the user
+	 * @param prefix - the prefix added to the table names to help avoid name conflicts i presume
+	 * @param logger - the JukeAlert logger instance so we can log messages/errors
+	 */
 	public Database(String host, String db, String user, String password, String prefix, Logger logger) {
 		this.host = host;
 		this.db = db;

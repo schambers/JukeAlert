@@ -26,6 +26,10 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 
 /**
+ * Class that "logs" information about our 'snitch' blocks and other actions
+ * that occur near a snitch block that we need to log.
+ * 
+ * Note that this isn't a logger like the java.util.logging.Logger class
  *
  * @author Dylan Holmes
  */
@@ -35,6 +39,7 @@ public class JukeAlertLogger {
     private JukeAlert plugin;
     private Database db;
 
+    
     public JukeAlertLogger(JukeAlert plugin) {
         this.plugin = plugin;
 
@@ -73,8 +78,8 @@ public class JukeAlertLogger {
 
         plugin.saveConfig();
 
-        db = new Database(host, dbname, user, pass, prefix, this.plugin.getLogger());
-        boolean connected = db.connect();
+        this.db = new Database(host, dbname, user, pass, prefix, this.plugin.getLogger());
+        boolean connected = this.db.connect();
         if (connected) {
             genTables();
         } else {
@@ -90,6 +95,14 @@ public class JukeAlertLogger {
      * Table generator
      */
     private void genTables() {
+    	
+    	// TODO: MARK
+    	// since the whole point of this plugin is to be faster / space efficent, we should look at these values and see if we
+    	// really need such high limits, example, the snitch_x is a integer with 10 digits, but since a block can't be placed on a 
+    	// half coordinate (or else it would be float), and the current map is 15,000 x 15,000, why do we need to store space for 5 
+    	// more digits for every record if we don't need to? Same for group (do we store the ID that the citadel plugin uses to reference a group
+    	// or just the group name? also why 40 characters), and the second table, we should probably have a details_id be the unique key,
+    	// and then either a FOREIGN KEY or just a integer that references the row in the 'snitches' table.
         //Snitches
         db.execute("CREATE TABLE IF NOT EXISTS `" + db.getPrefix() + "snitches` ("
                 + "`snitch_id` int(10) unsigned NOT NULL AUTO_INCREMENT,"
@@ -111,9 +124,16 @@ public class JukeAlertLogger {
                 + "PRIMARY KEY (`snitch_id`));");
     }
 
-    //Gets @limit events about that snitch. 
+    /**
+     * Gets @limit events about that snitch. 
+     * @param loc
+     * @param limit
+     * @return
+     */
     public Map<String, Date> getSnitchInfo(Location loc, int limit) {
         Map<String, Date> info = new HashMap<>();
+    	// TODO MARK: oh god sql injection BAD BAD BAD
+
         String query = "SELECT snitch_info, snitch_log_time"
                 + " FROM " + db.getPrefix() + "snitch_details WHERE snitch_location='"
                 + "World: " + loc.getWorld().getName() + " X: "
@@ -131,6 +151,11 @@ public class JukeAlertLogger {
         return info;
     }
 
+    /**
+     * 
+     * @param player
+     * @param entity
+     */
     public void logSnitchEntityKill(Player player, Entity entity) {
     }
 
@@ -185,6 +210,8 @@ public class JukeAlertLogger {
 
     //Logs the snitch being placed at World, x, y, z in the database.
     public void logSnitchPlace(String world, String group, int x, int y, int z) {
+    	
+    	// TODO MARK: oh god sql injection BAD BAD BAD
         db.execute("INSERT INTO " + db.getPrefix() + "snitches "
                 + "(snitch_world, snitch_x, snitch_y, snitch_z, snitch_group, snitch_cuboid_x, snitch_cuboid_y, snitch_cuboid_z) "
                 + "VALUES("
@@ -201,6 +228,8 @@ public class JukeAlertLogger {
 
     //Removes the snitch at the location of World, X, Y, Z from the database.
     public void logSnitchBreak(String world, double x, double y, double z) {
+    	// TODO MARK: oh god sql injection BAD BAD BAD
+
         db.execute("DELETE FROM " + db.getPrefix() + "snitches WHERE snitch_world='" + world + "' AND snitch_x='" + x + "' AND snitch_y='" + y + "' AND snitch_z='" + z + "'");
     }
 
@@ -209,6 +238,8 @@ public class JukeAlertLogger {
         int lX = loc.getBlockX();
         int lY = loc.getBlockY();
         int lZ = loc.getBlockZ();
+    	// TODO MARK: oh god sql injection BAD BAD BAD
+
         db.execute("UPDATE " + db.getPrefix() + "snitches SET snitch_group='" + group + "' WHERE snitch_world='"
                 + loc.getWorld().getName() + "' AND snitch_x='" + lX + "' AND snitch_y='" + lY + "' AND snitch_z='" + lZ + "'");
     }
@@ -218,6 +249,8 @@ public class JukeAlertLogger {
         int lX = loc.getBlockX();
         int lY = loc.getBlockY();
         int lZ = loc.getBlockZ();
+    	// TODO MARK: oh god sql injection BAD BAD BAD
+
         db.execute("UPDATE " + db.getPrefix() + "snitches SET snitch_cuboid_x='" + x + "', snitch_cuboid_y='" + y
                 + "', snitch_cuboid_z='" + z + "' WHERE snitch_world='" + loc.getWorld().getName() + "' AND snitch_x='" + lX + "' AND snitch_y='" + lY + "' AND snitch_z='" + lZ + "'");
     }
