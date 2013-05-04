@@ -1,8 +1,14 @@
 name: JukeAlert
 main: com.untamedears.JukeAlert.JukeAlert
 version: .1
-
 commands:
-   basic:
-      description: This is a demo command.
-      usage: /<command> [player]
+  jahelp:
+    description: Displays help
+    usage: /jahelp
+  jainfo:
+    description: Display information from a Snitch
+    usage: /jainfo
+  jaclear:
+    description: Clear information from a Snitch
+    usage: /jaclear
+depend: [Citadel]

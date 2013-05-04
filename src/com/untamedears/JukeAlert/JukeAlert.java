@@ -1,51 +1,90 @@
 package com.untamedears.JukeAlert;
 
-import com.untamedears.JukeAlert.sql.JukeAlertLogger;
-import java.util.ArrayList;
-import java.util.List;
+import com.untamedears.JukeAlert.command.CommandHandler;
+import com.untamedears.JukeAlert.command.commands.ClearCommand;
+import com.untamedears.JukeAlert.command.commands.HelpCommand;
+import com.untamedears.JukeAlert.command.commands.InfoCommand;
+import com.untamedears.JukeAlert.group.GroupMediator;
+import com.untamedears.JukeAlert.listener.JukeAlertListener;
+import com.untamedears.JukeAlert.manager.ConfigManager;
+import com.untamedears.JukeAlert.manager.SnitchManager;
+import com.untamedears.JukeAlert.storage.JukeAlertLogger;
+
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class JukeAlert extends JavaPlugin {
 
-	public static final Logger LOGGER = Logger.getLogger("Minecraft");
+	private static JukeAlert instance;
 	private JukeAlertLogger jaLogger;
-	private List<JukeAlertSnitch> snitches = new ArrayList<>();
-
+	private ConfigManager configManager;
+	private SnitchManager snitchManager;
+	private CommandHandler commandHandler;
+	private GroupMediator groupMediator;
+        
 	@Override
 	public void onEnable() {
-		jaLogger = new JukeAlertLogger(this);
-
-		JukeAlertCommands commands = new JukeAlertCommands(this);
-		for (String command : getDescription().getCommands().keySet()) {
-
-			getCommand(command).setExecutor(commands);
-		}
+		instance = this;
+		configManager = new ConfigManager();
+		groupMediator = new GroupMediator();
+		jaLogger = new JukeAlertLogger();
+		snitchManager = new SnitchManager();
+		registerEvents();
+		registerCommands();
+		snitchManager.loadSnitches();
 	}
 
 	@Override
 	public void onDisable() {
-		//TODO: Make sure everything saves properly and does save.
+		snitchManager.saveSnitches();
+	}
+	
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		return commandHandler.dispatch(sender, label, args);
+	}
+	
+	private void registerEvents() {
+		PluginManager pm = getServer().getPluginManager();
+		pm.registerEvents(new JukeAlertListener(), this);
+	}
+	
+	private void registerCommands() {
+		commandHandler = new CommandHandler();
+		commandHandler.addCommand(new InfoCommand());
+		commandHandler.addCommand(new ClearCommand());
+		commandHandler.addCommand(new HelpCommand());
+	}
+	
+	public static JukeAlert getInstance() {
+		return instance;
 	}
 
-	//Gets the JaLogger.
 	public JukeAlertLogger getJaLogger() {
 		return jaLogger;
 	}
+	
+	public ConfigManager getConfigManager()	{
+		return configManager;
+	}
+	
+	public SnitchManager getSnitchManager() {
+		return snitchManager;
+	}
+	
+	public GroupMediator getGroupMediator() {
+		return groupMediator;
+	}
+	
+	public CommandHandler getCommandHandler() {
+		return commandHandler;
+	}
 
 	//Logs a message with the level of Info.
-	public static void log(String message) {
-		log(Level.INFO, message);
-	}
-
-	//Logs a message with a level defined.
-	public static void log(Level level, String message) {
-		LOGGER.log(level, "[HCSMP] " + message);
-	}
-
-	//Logs a message with a level define and a throwable.
-	public static void log(Level level, String message, Throwable thrown) {
-		LOGGER.log(level, "[HCSMP] " + message, thrown);
+	public void log(String message) {
+		this.getLogger().log(Level.INFO, message);
 	}
 }
