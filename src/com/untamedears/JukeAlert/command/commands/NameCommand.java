@@ -13,33 +13,40 @@ import com.untamedears.JukeAlert.model.Snitch;
 import com.untamedears.JukeAlert.tasks.GetSnitchInfoPlayerTask;
 import org.bukkit.Bukkit;
 
-public class InfoCommand extends PlayerCommand {
+public class NameCommand extends PlayerCommand {
 
-    public InfoCommand() {
-        super("Info");
-        setDescription("Displays information from a Snitch");
-        setUsage("/jainfo <page number>");
-        setArgumentRange(0, 1);
-        setIdentifier("jainfo");
+    public NameCommand() {
+        super("Name");
+        setDescription("Set snitch name");
+        setUsage("/janame <name>");
+        setArgumentRange(1, 1);
+        setIdentifier("janame");
     }
 
     @Override
     public boolean execute(CommandSender sender, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            int offset = 1;
-            if (args.length > 0) {
-                offset = Integer.parseInt(args[0]);
+            World world = player.getWorld();
+
+            String name = "";
+            if (args[0].length() > 40) {
+                name = args[0].substring(0, 39);
+            } else {
+            	name = args[0];
             }
-            if (offset < 1) {
-                offset = 1;
-            }
+            
             Set<Snitch> snitches = plugin.getSnitchManager().findSnitches(player.getWorld(), player.getLocation());
             for (Snitch snitch : snitches) {
                 //Get only first snitch in cuboid
                 if (JukeAlert.isOnSnitch(snitch, player.getName())) {
-                    sendLog(sender, snitch, offset);
-                    break;
+                   plugin.getJaLogger().updateSnitchName(snitch, name);
+                   Snitch newSnitch = snitch;
+                   newSnitch.setName(name);
+                   plugin.getSnitchManager().removeSnitch(snitch);
+                   plugin.getSnitchManager().addSnitch(newSnitch);
+                   sender.sendMessage(ChatColor.AQUA + " Changed snitch name to " + name);
+                   break;
                 }
             }
 
@@ -48,13 +55,6 @@ public class InfoCommand extends PlayerCommand {
             return false;
         }
         return false;
-
-    }
-
-    private void sendLog(CommandSender sender, Snitch snitch, int offset) {
-        Player player = (Player) sender;
-        GetSnitchInfoPlayerTask task = new GetSnitchInfoPlayerTask(plugin, snitch.getId(), offset, player);
-        Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, task);
 
     }
 }
