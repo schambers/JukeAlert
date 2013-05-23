@@ -27,6 +27,10 @@
         <jar jarfile="${dist}/lib/JukeAlert-${DSTAMP}.jar" basedir="${build}"/>
     </target>
 
+    <target name="test">
+        <!-- just do nothing for now until travis is building properly -->
+    </target>
+
     <target name="clean"
             description="clean up" >
         <!-- Delete the ${build} and ${dist} directory trees -->
