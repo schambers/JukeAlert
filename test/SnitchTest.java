@@ -15,5 +15,4 @@ public class SnitchTest {
         assert snitch.getName().equals("");
     }
 
-
 }
