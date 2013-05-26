@@ -12,10 +12,10 @@
     <property name="junit" location="lib/junit-4.11.jar" />
 
     <path id="classpath.test">
-        <pathelement location="${src}" />
         <pathelement location="${lib}" />
         <pathelement location="${junit}" />
         <pathelement location="${test}" />
+        <pathelement location="${build}" />
         <pathelement location="${build}/test" />
     </path>
 
@@ -25,7 +25,7 @@
         </fileset>
     </path>
 
-    <target name="init">
+    <target name="init" depends="clean">
         <!-- Create the time stamp -->
         <tstamp/>
 
@@ -46,7 +46,6 @@
             </classpath>
         </javac>
         <javac srcdir="${test}" destdir="${build}/test">
-            <classpath location="bin" />
             <classpath refid="classpath.test" />
             <classpath refid="lib.main.path" />
         </javac>
