@@ -4,15 +4,25 @@
     </description>
     <!-- set global properties for this build -->
     <property name="src" location="src"/>
+    <property name="bin" location="bin" />
     <property name="build" location="build"/>
     <property name="dist"  location="dist"/>
     <property name="test" location="test" />
+    <property name="lib" location="lib" />
     <property name="junit" location="lib/junit-4.11.jar" />
 
     <path id="classpath.test">
+        <pathelement location="${src}" />
+        <pathelement location="${lib}" />
         <pathelement location="${junit}" />
         <pathelement location="${test}" />
         <pathelement location="${build}/test" />
+    </path>
+
+    <path id="lib.main.path">
+        <fileset dir="${lib}">
+            <include name="**.*jar" />
+        </fileset>
     </path>
 
     <target name="init">
@@ -26,24 +36,29 @@
 
     <target name="compile" depends="init" description="compile the source " >
         <!-- Compile the java code from ${src} into ${build} -->
-        <javac srcdir="${src}" destdir="${build}"/>
-        <javac srcdir="${test}" destdir="${build}/test">
+        <javac destdir="${build}">
+            <src path="${src}" />
             <classpath>
-                <pathelement location="${junit}" />
+                <pathelement location="${src}" />
+                <fileset dir="${lib}">
+                    <include name="*.jar" />
+                </fileset>
             </classpath>
+        </javac>
+        <javac srcdir="${test}" destdir="${build}/test">
+            <classpath location="bin" />
+            <classpath refid="classpath.test" />
+            <classpath refid="lib.main.path" />
         </javac>
     </target>
 
     <target name="dist" depends="compile" description="generate the distribution" >
-        <!-- Create the distribution directory -->
-        <mkdir dir="${dist}/lib"/>
-
         <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
         <jar jarfile="${dist}/lib/JukeAlert-${DSTAMP}.jar" basedir="${build}"/>
     </target>
 
     <target name="test">
-        <junit haltonfailure="true">
+        <junit fork="yes" haltonfailure="true">
             <classpath refid="classpath.test" />
             <batchtest fork="yes" todir="test">
                 <formatter type="brief" usefile="false" />
