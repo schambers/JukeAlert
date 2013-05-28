@@ -21,7 +21,7 @@
 
     <path id="lib.main.path">
         <fileset dir="${lib}">
-            <include name="**.*jar" />
+            <include name="*.jar" />
         </fileset>
     </path>
 
@@ -40,10 +40,8 @@
             <src path="${src}" />
             <classpath>
                 <pathelement location="${src}" />
-                <fileset dir="${lib}">
-                    <include name="*.jar" />
-                </fileset>
             </classpath>
+            <classpath refid="lib.main.path" />
         </javac>
         <javac srcdir="${test}" destdir="${build}/test">
             <classpath refid="classpath.test" />
@@ -52,9 +50,10 @@
     </target>
 
     <target name="test" depends="compile">
-        <junit fork="yes" haltonfailure="true">
+        <junit fork="true" haltonfailure="true">
             <classpath refid="classpath.test" />
-            <batchtest fork="yes" todir="test">
+            <classpath refid="lib.main.path" />
+            <batchtest fork="true" todir="test">
                 <formatter type="brief" usefile="false" />
                 <fileset dir="${test}">
                     <include name="**/*Test*.java" />
